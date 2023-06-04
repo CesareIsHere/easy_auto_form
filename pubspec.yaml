@@ -1,6 +1,6 @@
 name: easy_auto_form
 description: Auto generate form from json schema
-version: 0.0.1
+version: 0.0.2
 homepage: https://github.com/CesareIsHere/easy_auto_form
 
 environment:

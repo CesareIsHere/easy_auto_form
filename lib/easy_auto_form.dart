@@ -152,10 +152,12 @@ class _AutoFormState extends State<EasyAutoForm> {
                   }
                   break;
                 case FieldInputType.select:
-                  if (fieldSetting.selectOptions == null)
+                  if (fieldSetting.selectOptions == null) {
                     throw Exception("Select options cannot be null");
-                  if (fieldSetting.selectOptions!.isEmpty)
+                  }
+                  if (fieldSetting.selectOptions!.isEmpty) {
                     throw Exception("Select options cannot be empty");
+                  }
                   widgets.add(
                     selectTextFormField(key, fieldSetting.selectOptions!),
                   );
@@ -343,7 +345,6 @@ class _AutoFormState extends State<EasyAutoForm> {
 
   // Autocomplete form field usign AutocompleteSource that has a function that returns a list of strings (async or not). Use material autocomplete
   Widget autocompleteTextFormField(key, AutocompleteSource source) {
-    if (source == null) throw Exception("AutocompleteSource cannot be null");
     return Autocomplete(
       optionsBuilder: (TextEditingValue textEditingValue) async {
         if (textEditingValue.text == '') {

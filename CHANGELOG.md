@@ -1,3 +1,9 @@
+## 0.0.2
+
+### Added
+
+- Added support for select and autocomplete input types.
+
 ## 0.0.1 - Initial Release
 
 ### Added

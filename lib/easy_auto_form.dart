@@ -100,7 +100,8 @@ class _AutoFormState extends State<EasyAutoForm> {
               if (widget.fieldsToIgnore?.contains(key) ?? false) continue;
 
               FieldSetting? fieldSetting = widget.fieldsSettings?.settings
-                  .firstWhere((element) => element.fieldKey == key);
+                  .firstWhere((element) => element.fieldKey == key,
+                      orElse: () => FieldSetting(fieldKey: key));
 
               fieldSetting ??= FieldSetting(fieldKey: key);
 
@@ -345,14 +346,14 @@ class _AutoFormState extends State<EasyAutoForm> {
 
   // Autocomplete form field usign AutocompleteSource that has a function that returns a list of strings (async or not). Use material autocomplete
   Widget autocompleteTextFormField(key, AutocompleteSource source) {
-    return Autocomplete(
-      optionsBuilder: (TextEditingValue textEditingValue) async {
+    return Autocomplete<String>(
+      optionsBuilder: (textEditingValue) async {
         if (textEditingValue.text == '') {
           return const Iterable<String>.empty();
         }
         return await source.source!(textEditingValue.text);
       },
-      onSelected: (String selection) {
+      onSelected: (dynamic selection) {
         shadowEntity[key] = selection;
         setState(() {});
       },
@@ -366,13 +367,12 @@ class _AutoFormState extends State<EasyAutoForm> {
               widget.stringInputDecorationOverride?.copyWith(labelText: key) ??
                   InputDecoration(labelText: key),
           focusNode: focusNode,
-          onFieldSubmitted: (String value) {
+          onFieldSubmitted: (value) {
             onFieldSubmitted();
           },
         );
       },
-      optionsViewBuilder: (BuildContext context,
-          AutocompleteOnSelected<String> onSelected, Iterable<String> options) {
+      optionsViewBuilder: (context, onSelected, options) {
         return Align(
           alignment: Alignment.topLeft,
           child: Material(
@@ -382,7 +382,7 @@ class _AutoFormState extends State<EasyAutoForm> {
               child: ListView(
                 padding: const EdgeInsets.all(8.0),
                 children: options
-                    .map((String option) => GestureDetector(
+                    .map((option) => GestureDetector(
                           onTap: () {
                             onSelected(option);
                           },

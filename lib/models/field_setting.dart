@@ -26,5 +26,5 @@ class AutocompleteSource {
     required this.source,
   });
 
-  final Future<List<dynamic>> Function(String pattern)? source;
+  final Future<List<String>> Function(String pattern)? source;
 }

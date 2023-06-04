@@ -1,10 +1,10 @@
-library auto_form;
+library easy_auto_form;
 
 import 'package:flutter/material.dart';
 
 /// A widget that generates a form based on a given entity.
 ///
-/// The `AutoForm` widget is designed to work with any entity that is represented as a `Map<String, dynamic>`.
+/// The `EasyAutoForm` widget is designed to work with any entity that is represented as a `Map<String, dynamic>`.
 /// This means that it can be used with a wide variety of data types, including but not limited to:
 ///
 /// - User profiles
@@ -13,9 +13,9 @@ import 'package:flutter/material.dart';
 /// - Contact information
 /// - Survey responses
 ///
-/// The `AutoForm` widget will generate input fields for each key in the entity map, and will automatically determine the appropriate input type based on the value type.
-class AutoForm extends StatefulWidget {
-  const AutoForm({
+/// The `EasyAutoForm` widget will generate input fields for each key in the entity map, and will automatically determine the appropriate input type based on the value type.
+class EasyAutoForm extends StatefulWidget {
+  const EasyAutoForm({
     Key? key,
     required this.formKey,
     required this.entity,
@@ -60,10 +60,10 @@ class AutoForm extends StatefulWidget {
   final InputDecoration? dateTimeInputDecorationOverride;
 
   @override
-  State<AutoForm> createState() => _AutoFormState();
+  State<EasyAutoForm> createState() => _AutoFormState();
 }
 
-class _AutoFormState extends State<AutoForm> {
+class _AutoFormState extends State<EasyAutoForm> {
   final shadowEntity = <String, dynamic>{};
 
   @override
@@ -92,6 +92,7 @@ class _AutoFormState extends State<AutoForm> {
                     decoration: widget.intInputDecorationOverride
                             ?.copyWith(labelText: key) ??
                         InputDecoration(labelText: key),
+                    keyboardType: TextInputType.number,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter some text';
@@ -116,6 +117,7 @@ class _AutoFormState extends State<AutoForm> {
                     decoration: widget.doubleInputDecorationOverride
                             ?.copyWith(labelText: key) ??
                         InputDecoration(labelText: key),
+                    keyboardType: TextInputType.number,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter some text';
@@ -192,7 +194,7 @@ class _AutoFormState extends State<AutoForm> {
                 );
               }
               // If key is a dynamic field type, create a text input
-              else if (widget.entity[key] is dynamic) {
+              else {
                 widgets.add(
                   TextFormField(
                     initialValue: shadowEntity[key]?.toString() ?? "",
@@ -221,7 +223,7 @@ class _AutoFormState extends State<AutoForm> {
             children: [
               ElevatedButton(
                 onPressed: widget.onCancel,
-                child: Text('Cancella'),
+                child: const Text('Cancella'),
               ),
               ElevatedButton(
                 onPressed: () {
@@ -232,7 +234,7 @@ class _AutoFormState extends State<AutoForm> {
 
                   setState(() {});
                 },
-                child: Text('Salva'),
+                child: const Text('Salva'),
               ),
             ],
           ),

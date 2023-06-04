@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:auto_form/auto_form.dart';
+import 'package:easy_auto_form/easy_auto_form.dart';
 
 void main() {
-  group('AutoForm', () {
+  group('EasyAutoForm', () {
     testWidgets('Renders all fields', (WidgetTester tester) async {
       final formKey = GlobalKey<FormState>();
       final entity = {
@@ -14,7 +14,7 @@ void main() {
         'birthday': DateTime(1990, 1, 1),
         'notes': 'Some notes',
       };
-      final widget = AutoForm(
+      final widget = EasyAutoForm(
         formKey: formKey,
         entity: entity,
         onSave: (_) {},
@@ -42,7 +42,7 @@ void main() {
       };
       final widget = Scaffold(
         body: Center(
-          child: AutoForm(
+          child: EasyAutoForm(
             formKey: formKey,
             entity: entity,
             onSave: expectAsync1((result) {

@@ -12,20 +12,20 @@ and the Flutter guide for
 -->
 
 A widget that generates a form based on a given entity.
-The `AutoForm` widget is designed to work with any entity that is represented as a `Map<String, dynamic>`.
+The `EasyAutoForm` widget is designed to work with any entity that is represented as a `Map<String, dynamic>`.
 This means that it can be used with a wide variety of data types, including but not limited to:
+
 - User profiles
 - Product listings
 - Blog posts
 - Contact information
 - Survey responses
-The `AutoForm` widget will generate input fields for each key in the entity map, and will automatically determine the appropriate input type based on the value type.
+  The `EasyAutoForm` widget will generate input fields for each key in the entity map, and will automatically determine the appropriate input type based on the value type.
 
 ## Features
 
 - Supports a variety of entity types, including user profiles, product listings, blog posts, contact information, and survey responses.
 - Includes options to ignore specific fields, override input decoration for different data types, and handle form submission and cancellation.
-
 
 ## Getting started
 
@@ -33,7 +33,7 @@ The `AutoForm` widget will generate input fields for each key in the entity map,
 
 ```yaml
 dependencies:
-  auto_form: ^0.0.1
+  easy_auto_form: ^0.0.1
 ```
 
 - Install it
@@ -49,22 +49,23 @@ $ flutter pub get
 Now in your Dart code, you can use:
 
 ```dart
-import 'package:auto_form/auto_form.dart';
+import 'package:easy_auto_form/easy_auto_form.dart';
 ```
 
 ## Usage
 
-The `AutoForm` widget is designed to work with any entity that is represented as a `Map<String, dynamic>`.
+The `EasyAutoForm` widget is designed to work with any entity that is represented as a `Map<String, dynamic>`.
 This means that it can be used with a wide variety of data types, including but not limited to:
+
 - User profiles
 - Product listings
 - Blog posts
 - Contact information
 - Survey responses
-The `AutoForm` widget will generate input fields for each key in the entity map, and will automatically determine the appropriate input type based on the value type.
+  The `EasyAutoForm` widget will generate input fields for each key in the entity map, and will automatically determine the appropriate input type based on the value type.
 
 ```dart
-import 'package:auto_form/auto_form.dart';
+import 'package:easy_auto_form/easy_auto_form.dart';
 
 class User {
   String name;
@@ -84,7 +85,7 @@ class User {
 
     final user = User(name: 'John Doe', email: 'john@gmail.com', password '123456');
 
-    AutoForm(
+    EasyAutoForm(
         entity: user.toMap(),
         onSaved: (entity) {
             // Do something with the entity
@@ -97,6 +98,9 @@ class User {
 
 ## Additional information
 
-TODO: Tell users more about the package: where to find more information, how to
-contribute to the package, how to file issues, what response they can expect
-from the package authors, and more.
+### Input types
+
+- `String` values will be rendered as `TextFormField`s.
+- `bool` values will be rendered as `Checkbox`es.
+- `int` and `double` values will be rendered as `TextFormField`s with `keyboardType` set to `TextInputType.number`.
+- `DateTime` values will be rendered as `DateTimeField`s.

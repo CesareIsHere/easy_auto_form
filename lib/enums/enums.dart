@@ -3,3 +3,9 @@ enum FieldInputType {
   select,
   autocomplete,
 }
+
+enum RunDirection {
+  horizontal,
+  vertical,
+  wrap,
+}

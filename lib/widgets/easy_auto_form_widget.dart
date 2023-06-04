@@ -22,7 +22,7 @@ class EasyAutoForm extends StatefulWidget {
     Key? key,
     required this.formKey,
     required this.entity,
-    this.entityAsMock = true,
+    this.entityAsMock = false,
     this.fieldsToIgnore,
     required this.onSave,
     this.stringInputDecorationOverride,
@@ -33,6 +33,12 @@ class EasyAutoForm extends StatefulWidget {
     this.autocompleteInputDecorationOverride,
     this.onCancel,
     this.fieldsSettings,
+    this.runDirection = RunDirection.wrap,
+    this.autovalidateMode = AutovalidateMode.disabled,
+    this.onFormChanged,
+    this.onFormWillPop,
+    this.showDialogOnWillPop = false,
+    this.expanded = true,
   }) : super(key: key);
 
   /// A key that uniquely identifies the form.
@@ -74,16 +80,83 @@ class EasyAutoForm extends StatefulWidget {
   /// A list of settings to apply to each field.
   final FieldsSettings? fieldsSettings;
 
+  /// The direction to run the form fields in.
+  final RunDirection? runDirection;
+
+  /// The autovalidate mode to use for the form.
+  final AutovalidateMode? autovalidateMode;
+
+  /// A function to call when the form is changed.
+  final void Function(Map<String, TextEditingController> controllers)?
+      onFormChanged;
+
+  /// A function to call when the form is about to be popped.
+  final Future<bool> Function()? onFormWillPop;
+
+  /// Whether to show a dialog when the form is about to be popped.
+  final bool showDialogOnWillPop;
+
+  /// Whether to expand the form to fill the available space.
+  final bool expanded;
+
   @override
   State<EasyAutoForm> createState() => _AutoFormState();
 }
 
 class _AutoFormState extends State<EasyAutoForm> {
   final shadowEntity = <String, dynamic>{};
+  final controllers = <String, TextEditingController>{};
+
+  Future<bool> handleOnWillPop() async {
+    bool result = false;
+
+    if (widget.showDialogOnWillPop && context.mounted) {
+      result = await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Are you sure?'),
+          content: Text('Any unsaved changes will be lost.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+              child: Text('Yes'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+              child: Text('No'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (widget.onFormWillPop != null) {
+      if (await widget.onFormWillPop!()) {
+        result = true;
+      } else {
+        result = false;
+      }
+    }
+
+    return result;
+  }
 
   @override
   void initState() {
-    if (!widget.entityAsMock) shadowEntity.addAll(widget.entity);
+    if (widget.entityAsMock) shadowEntity.addAll(widget.entity);
+
+    for (var key in widget.entity.keys) {
+      if (widget.fieldsToIgnore?.contains(key) ?? false) continue;
+
+      controllers[key] = TextEditingController(
+        text: widget.entityAsMock ? widget.entity[key]?.toString() : null,
+      );
+    }
+
     super.initState();
   }
 
@@ -91,119 +164,156 @@ class _AutoFormState extends State<EasyAutoForm> {
   Widget build(BuildContext context) {
     return Form(
       key: widget.formKey,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ...() {
-            var widgets = <Widget>[];
-            for (var key in widget.entity.keys) {
-              if (widget.fieldsToIgnore?.contains(key) ?? false) continue;
+      autovalidateMode: widget.autovalidateMode,
+      onWillPop: handleOnWillPop,
+      onChanged: () {
+        if (widget.onFormChanged != null) widget.onFormChanged!(controllers);
+      },
+      child: widget.runDirection == RunDirection.vertical
+          ? Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ...formContent(),
+              ],
+            )
+          : widget.runDirection == RunDirection.horizontal
+              ? Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ...formContent(),
+                  ],
+                )
+              : Wrap(
+                  children: [
+                    ...formContent(),
+                  ],
+                ),
+    );
+  }
 
-              FieldSetting? fieldSetting = widget.fieldsSettings?.settings
-                  .firstWhere((element) => element.fieldKey == key,
-                      orElse: () => FieldSetting(fieldKey: key));
+  List<Widget> formContent() {
+    return [
+      ...() {
+        var widgets = <Widget>[];
+        for (var key in widget.entity.keys) {
+          if (widget.fieldsToIgnore?.contains(key) ?? false) continue;
 
-              fieldSetting ??= FieldSetting(fieldKey: key);
+          FieldSetting? fieldSetting = widget.fieldsSettings?.settings
+              .firstWhere((element) => element.fieldKey == key,
+                  orElse: () => FieldSetting(fieldKey: key));
 
-              switch (fieldSetting.inputType) {
-                case FieldInputType.normal:
-                  // If key is an int field type, create an input with int validators
-                  if (widget.entity[key] is int) {
-                    widgets.add(
-                      intTextFormField(key),
-                    );
-                  }
-                  // If key is a double field type, create an input with double validators
-                  else if (widget.entity[key] is double) {
-                    widgets.add(
-                      doubleTextFormField(key),
-                    );
-                  }
-                  // If key is a String field type, create an input with String validators
-                  else if (widget.entity[key] is String) {
-                    widgets.add(
-                      stringTextFormField(key),
-                    );
-                  }
-                  // If key is a bool field type, create a checkbox
-                  else if (widget.entity[key] is bool) {
-                    widgets.add(
-                      CheckboxListTile(
-                        title: Text(key),
-                        value: shadowEntity[key] ?? false,
-                        onChanged: (value) {
-                          setState(() {
-                            shadowEntity[key] = value;
-                          });
-                        },
-                      ),
-                    );
-                  }
-                  // If key is a DateTime field type, create a date picker
-                  else if (widget.entity[key] is DateTime) {
-                    widgets.add(
-                      dateTimeTextFormField(key),
-                    );
-                  }
-                  // If key is a dynamic field type, create a text input
-                  else {
-                    widgets.add(
-                      stringTextFormField(key),
-                    );
-                  }
-                  break;
-                case FieldInputType.select:
-                  if (fieldSetting.selectOptions == null) {
-                    throw Exception("Select options cannot be null");
-                  }
-                  if (fieldSetting.selectOptions!.isEmpty) {
-                    throw Exception("Select options cannot be empty");
-                  }
-                  widgets.add(
-                    selectTextFormField(key, fieldSetting.selectOptions!),
-                  );
-                  break;
-                case FieldInputType.autocomplete:
-                  if (fieldSetting.autocompleteSource == null) {
-                    throw Exception("Autocomplete source cannot be null");
-                  }
-                  widgets.add(
-                    autocompleteTextFormField(
-                        key, fieldSetting.autocompleteSource!),
-                  );
-                  break;
+          fieldSetting ??= FieldSetting(fieldKey: key);
+
+          switch (fieldSetting.inputType) {
+            case FieldInputType.normal:
+              // If key is an int field type, create an input with int validators
+              if (widget.entity[key] is int) {
+                widgets.add(
+                  intTextFormField(key),
+                );
               }
-            }
-            return widgets;
-          }(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              ElevatedButton(
-                onPressed: widget.onCancel,
-                child: const Text('Cancella'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  if (widget.formKey.currentState!.validate()) {
-                    widget.formKey.currentState!.save();
-                    widget.onSave!(shadowEntity);
-                  }
+              // If key is a double field type, create an input with double validators
+              else if (widget.entity[key] is double) {
+                widgets.add(
+                  doubleTextFormField(key),
+                );
+              }
+              // If key is a String field type, create an input with String validators
+              else if (widget.entity[key] is String) {
+                widgets.add(
+                  stringTextFormField(key),
+                );
+              }
+              // If key is a bool field type, create a checkbox
+              else if (widget.entity[key] is bool) {
+                widgets.add(
+                  CheckboxListTile(
+                    title: Text(key),
+                    value: shadowEntity[key] ?? false,
+                    onChanged: (value) {
+                      setState(() {
+                        shadowEntity[key] = value;
+                      });
+                    },
+                  ),
+                );
+              }
+              // If key is a DateTime field type, create a date picker
+              else if (widget.entity[key] is DateTime) {
+                widgets.add(
+                  dateTimeTextFormField(key),
+                );
+              }
+              // If key is a dynamic field type, create a text input
+              else {
+                widgets.add(
+                  stringTextFormField(key),
+                );
+              }
+              break;
+            case FieldInputType.select:
+              if (fieldSetting.selectOptions == null) {
+                throw Exception("Select options cannot be null");
+              }
+              if (fieldSetting.selectOptions!.isEmpty) {
+                throw Exception("Select options cannot be empty");
+              }
+              widgets.add(
+                selectTextFormField(key, fieldSetting.selectOptions!),
+              );
+              break;
+            case FieldInputType.autocomplete:
+              if (fieldSetting.autocompleteSource == null) {
+                throw Exception("Autocomplete source cannot be null");
+              }
+              widgets.add(
+                autocompleteTextFormField(
+                    key, fieldSetting.autocompleteSource!),
+              );
+              break;
+          }
+        }
 
-                  setState(() {});
-                },
-                child: const Text('Salva'),
-              ),
-            ],
-          ),
-        ],
-      ),
+        return widget.expanded
+            ? widgets.map((e) => Expanded(child: e)).toList()
+            : widgets;
+      }(),
+      widget.expanded
+          ? Expanded(
+              child: formButtons(),
+            )
+          : formButtons(),
+    ];
+  }
+
+  Widget formButtons() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        ElevatedButton(
+          onPressed: widget.onCancel,
+          child: const Text('Cancella'),
+        ),
+        const SizedBox(width: 10),
+        ElevatedButton(
+          onPressed: () {
+            if (widget.formKey.currentState!.validate()) {
+              widget.formKey.currentState!.save();
+              widget.onSave!(shadowEntity);
+            }
+
+            setState(() {});
+          },
+          child: const Text('Salva'),
+        ),
+      ],
     );
   }
 
   Widget intTextFormField(key) {
     return TextFormField(
-      initialValue: shadowEntity[key]?.toString() ?? "0",
+      controller: controllers[key],
       decoration: widget.intInputDecorationOverride?.copyWith(labelText: key) ??
           InputDecoration(labelText: key),
       keyboardType: TextInputType.number,
@@ -225,7 +335,7 @@ class _AutoFormState extends State<EasyAutoForm> {
 
   Widget doubleTextFormField(key) {
     return TextFormField(
-      initialValue: shadowEntity[key]?.toString() ?? "0",
+      controller: controllers[key],
       decoration:
           widget.doubleInputDecorationOverride?.copyWith(labelText: key) ??
               InputDecoration(labelText: key),
@@ -248,7 +358,7 @@ class _AutoFormState extends State<EasyAutoForm> {
 
   Widget stringTextFormField(key) {
     return TextFormField(
-      initialValue: shadowEntity[key]?.toString() ?? "",
+      controller: controllers[key],
       decoration:
           widget.stringInputDecorationOverride?.copyWith(labelText: key) ??
               InputDecoration(labelText: key),
@@ -279,7 +389,7 @@ class _AutoFormState extends State<EasyAutoForm> {
 
   Widget dateTimeTextFormField(key) {
     return TextFormField(
-      initialValue: shadowEntity[key]?.toString() ?? '',
+      controller: controllers[key],
       decoration:
           widget.dateTimeInputDecorationOverride?.copyWith(labelText: key) ??
               InputDecoration(labelText: key),
@@ -301,7 +411,7 @@ class _AutoFormState extends State<EasyAutoForm> {
 
   Widget dynamicTextFormField(key) {
     return TextFormField(
-      initialValue: shadowEntity[key]?.toString() ?? "",
+      controller: controllers[key],
       decoration:
           widget.stringInputDecorationOverride?.copyWith(labelText: key) ??
               InputDecoration(labelText: key),

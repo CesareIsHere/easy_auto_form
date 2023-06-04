@@ -114,20 +114,20 @@ class _AutoFormState extends State<EasyAutoForm> {
       result = await showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text('Are you sure?'),
-          content: Text('Any unsaved changes will be lost.'),
+          title: const Text('Are you sure?'),
+          content: const Text('Any unsaved changes will be lost.'),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(true);
               },
-              child: Text('Yes'),
+              child: const Text('Yes'),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(false);
               },
-              child: Text('No'),
+              child: const Text('No'),
             ),
           ],
         ),

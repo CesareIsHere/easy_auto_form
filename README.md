@@ -33,7 +33,7 @@ This means that it can be used with a wide variety of data types, including but 
 
 ```yaml
 dependencies:
-  easy_auto_form: ^0.0.1
+  easy_auto_form: ^0.0.2+3
 ```
 
 - Install it
@@ -72,28 +72,41 @@ class User {
   String email;
   String password;
 
-    User({this.name, this.email, this.password});
+  User({this.name, this.email, this.password});
 
-    Map<String, dynamic> toMap() {
-        return {
-            'name': name,
-            'email': email,
-            'password': password,
-        };
-        }
-    }
+  Map<String, dynamic> toMap() {
+    return {
+        'name': name,
+        'email': email,
+        'password': password,
+    };
+  }
+}
 
-    final user = User(name: 'John Doe', email: 'john@gmail.com', password '123456');
+final user = User(name: 'John Doe', email: 'john@gmail.com', password '123456');
 
-    EasyAutoForm(
-        entity: user.toMap(),
-        onSaved: (entity) {
-            // Do something with the entity
-        },
-        onCancel: () {
-            // Do something when the form is cancelled
-        },
-    );
+EasyAutoForm(
+    entity: user.toMap(),
+    onSaved: (entity) {
+        // Do something with the entity
+    },
+    onCancel: () {
+        // Do something when the form is cancelled
+    },
+    fieldsSettings: {
+        settings: [
+          FieldSetting(
+              inputType: FieldInputType.autocomplete,
+              autocompleteSource: AutocompleteSource(
+                source: () async => ['John Doe', 'Jane Doe'],
+                ),
+          ),
+          // Other settings
+        ],
+
+    },
+
+);
 ```
 
 ## Additional information
@@ -104,3 +117,5 @@ class User {
 - `bool` values will be rendered as `Checkbox`es.
 - `int` and `double` values will be rendered as `TextFormField`s with `keyboardType` set to `TextInputType.number`.
 - `DateTime` values will be rendered as `DateTimeField`s.
+- `List` values will be rendered according to their FieldSetting (select or autocomplete).
+

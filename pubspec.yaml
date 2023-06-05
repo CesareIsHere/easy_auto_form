@@ -1,5 +1,5 @@
 name: easy_auto_form
-description: Auto generate form from json schema
+description: Auto generate Form from json object
 version: 0.0.2+3
 homepage: https://github.com/CesareIsHere/easy_auto_form
 
@@ -15,6 +15,9 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
+
+example:
+  path: example/example.dart
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

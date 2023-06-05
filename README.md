@@ -33,7 +33,7 @@ This means that it can be used with a wide variety of data types, including but 
 
 ```yaml
 dependencies:
-  easy_auto_form: ^0.0.2+3
+  easy_auto_form: ^0.0.2+4
 ```
 
 - Install it

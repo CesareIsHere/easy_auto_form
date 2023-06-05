@@ -11,6 +11,15 @@ and the Flutter guide for
 [developing packages and plugins](https://flutter.dev/developing-packages).
 -->
 
+## Mission
+
+The mission of this package is to provide a simple simple simple way to generate forms based on a given entity.
+Sometimes you just want to generate a form based on a given entity, and you don't want to write a lot of code to do it (like validation, initial values, controllers, ecc).
+This package aims to make that process as simple as possible.
+Hope you enjoy it!
+
+## Introduction
+
 A widget that generates a form based on a given entity.
 The `EasyAutoForm` widget is designed to work with any entity that is represented as a `Map<String, dynamic>`.
 This means that it can be used with a wide variety of data types, including but not limited to:

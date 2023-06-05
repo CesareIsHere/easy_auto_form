@@ -1,6 +1,6 @@
 name: easy_auto_form
-description: Auto generate Form from json object
-version: 0.0.2+4
+description: EasyAutoForm is a Flutter package that generates a Form based on a given entity, supporting a variety of entity types and input types.
+version: 0.0.2+5
 homepage: https://github.com/CesareIsHere/easy_auto_form
 
 environment:

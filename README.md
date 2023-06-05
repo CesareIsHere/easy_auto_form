@@ -33,7 +33,7 @@ This means that it can be used with a wide variety of data types, including but 
 
 ```yaml
 dependencies:
-  easy_auto_form: ^0.0.2+4
+  easy_auto_form: ^latest
 ```
 
 - Install it
@@ -119,3 +119,8 @@ EasyAutoForm(
 - `DateTime` values will be rendered as `DateTimeField`s.
 - `List` values will be rendered according to their FieldSetting (select or autocomplete).
 
+### Examples
+For more examples of how to use easy_auto_form, check out the example directory in the package source code.
+
+### Contributing
+If you find a bug or have a feature request, please open an issue on the easy_auto_form GitHub repository. If you'd like to contribute code, please submit a pull request.

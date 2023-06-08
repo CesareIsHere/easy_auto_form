@@ -1,5 +1,3 @@
-library easy_auto_form;
-
 import 'package:easy_auto_form/enums/enums.dart';
 import 'package:easy_auto_form/models/field_setting.dart';
 import 'package:easy_auto_form/models/fields_settings.dart';
@@ -33,7 +31,7 @@ class EasyAutoForm extends StatefulWidget {
     this.autocompleteInputDecorationOverride,
     this.onCancel,
     this.fieldsSettings,
-    this.runDirection = RunDirection.wrap,
+    this.runDirection = RunDirection.vertical,
     this.autovalidateMode = AutovalidateMode.disabled,
     this.onFormChanged,
     this.onFormWillPop,
@@ -278,6 +276,7 @@ class _AutoFormState extends State<EasyAutoForm> {
             ? widgets.map((e) => Expanded(child: e)).toList()
             : widgets;
       }(),
+      const SizedBox(height: 16),
       widget.expanded
           ? Expanded(
               child: formButtons(),
@@ -289,7 +288,7 @@ class _AutoFormState extends State<EasyAutoForm> {
   Widget formButtons() {
     return Row(
       mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      mainAxisAlignment: MainAxisAlignment.end,
       children: [
         ElevatedButton(
           onPressed: widget.onCancel,

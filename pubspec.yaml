@@ -1,6 +1,6 @@
 name: easy_auto_form
 description: EasyAutoForm is a Flutter package that generates a Form based on a given entity, supporting a variety of entity types and input types.
-version: 0.0.2+6
+version: 0.0.2+7
 homepage: https://github.com/CesareIsHere/easy_auto_form
 
 environment:
